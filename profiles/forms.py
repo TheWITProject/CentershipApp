@@ -1,11 +1,21 @@
+
 from django import forms
-from profiles.models import Signup
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
-class SignupForm(forms.ModelForm):
-    name = forms.CharField(error_messages={'required':'Please enter your name'})
-    email = forms.CharField(error_messages={'required':'Please enter your email'})
-    password = forms.CharField(error_messages={'required':'Please enter your password'})
 
-    class Meta:
-        model = Signup
-        fields = ('name', 'email', 'password',)
+# Create your forms here.
+
+class NewUserForm(UserCreationForm):
+	email = forms.EmailField(required=True)
+
+	class Meta:
+		model = User
+		fields = ("username", "email", "password1", "password2")
+
+	def save(self, commit=True):
+		user = super(NewUserForm, self).save(commit=False)
+		user.email = self.cleaned_data['email']
+		if commit:
+			user.save()
+		return user
